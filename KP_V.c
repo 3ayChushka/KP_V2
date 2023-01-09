@@ -11,6 +11,7 @@ int new_zapisi(zapis, chislo_zapis);
 int pechat(zapis, chislo_zapis);
 int vivod_poisk(zapis, chislo_zapis);
 int poisk(zapis, chislo_zapis);
+void poisk_sec(zapis, chislo_zapis);
 void sohr(zapis, chislo_zapis);
 int sortirovka(zapis, chislo_zapis);
 void sohr(zapis, chislo_zapis);
@@ -39,7 +40,7 @@ int main() {
 
 	printf("Выберите пункт\n");
 	while (g != 0) {
-		printf("1)Добавить новую строку\n2)Вывод записей\n3)Поиск по критериям\n4)сортировка\n0)выход\n");
+		printf("1)Добавить новую строку\n2)Вывод записей\n3)Поиск по критериям\n4)сортировка\n5)изменить запись\n0)выход\n");
 		scanf("%d", &z);
 		switch (z) {
 		case 1:
@@ -48,7 +49,7 @@ int main() {
 			chislo_zapis = new_zapisi(zapis, chislo_zapis);
 
 			int o_f = 2;   /*Нужна для того, чтобы понять, для чего открыть файл(Для записи с начала или для дозаписования)*/
-			sohr(zapis, chislo_zapis-1, o_f);
+			sohr(zapis, chislo_zapis - 1, o_f);
 			break;
 		case 2:
 			out = fopen("kp.txt", "r");
@@ -66,8 +67,16 @@ int main() {
 			pechat(zapis, chislo_zapis);
 			break;
 		case 3:
-			poisk(zapis, chislo_zapis);
-			break;
+		{
+			int p;
+			printf("Выберите поиск:\n1-по имени\n2-по номеру секции\n");
+			scanf("%d", &p);
+		
+			if (p == 1)poisk(zapis, chislo_zapis);
+			else if (p == 2); poisk_sec(zapis, chislo_zapis);
+
+		break; 
+		}
 		case 4:
 			chislo_zapis = read(zapis, chislo_zapis);
 			ShellSort(zapis, chislo_zapis);
@@ -89,7 +98,7 @@ int main() {
 				if (i == 0) sohr(zapis, i, 1);
 				else sohr(zapis, i, 2);
 			}
-		break;
+			break;
 		}
 		case 0:
 			g = 0;
@@ -124,20 +133,28 @@ int pechat(kp* zapis, int chislo_zapis) {
 	}
 }
 int vivod_poisk(kp* zapis, int chislo_zapis) {
-	printf("Дата научного доклада-%d.%d.%d\n# Секции %d\n тема доклада-%s Ф.И.О-%s Регламент в минутах-%dmin\n\n", zapis[chislo_zapis].data[0], zapis[chislo_zapis].data[1], zapis[chislo_zapis].data[2], zapis[chislo_zapis].number, zapis[chislo_zapis].tema, zapis[chislo_zapis].FIO, zapis[chislo_zapis].min);
+	printf("Дата научного доклада-%d.%d.%d\n#Секции %d\nтема доклада-%sФ.И.О-%sРегламент в минутах-%dmin\n\n", zapis[chislo_zapis].data[0], zapis[chislo_zapis].data[1], zapis[chislo_zapis].data[2], zapis[chislo_zapis].number, zapis[chislo_zapis].tema, zapis[chislo_zapis].FIO, zapis[chislo_zapis].min);
 }
 
 int poisk(kp* zapis, int chislo_zapis) {
 	char name_poisk[50];
-	int number_poisk;
 	printf("Введите Ф.И.О\n");
 	getchar();
 	fgets(name_poisk, 50, stdin);
+	
+	for (int i = 0; i <= chislo_zapis; i++) {
+		if (strcmp(name_poisk, zapis[i].FIO) == 0) vivod_poisk(zapis, i);
+	}
+}
+
+void poisk_sec(kp* zapis, int chislo_zapis) {
+
+	int number_poisk;
 	printf("Введите # секции\n");
 	scanf("%d", &number_poisk);
-	for (int i = 0; i <= chislo_zapis; i++) {
-		if (strcmp(name_poisk, zapis[i].FIO) == 0 && (number_poisk == zapis[i].number)) vivod_poisk(zapis, i);
-	}
+
+	for (int i = 0; i <= chislo_zapis; i++)
+		if (number_poisk == zapis[i].number) vivod_poisk(zapis, i);
 }
 
 void sohr(kp* zapis, int chislo_zapis, int o_f)
@@ -163,7 +180,7 @@ int read(kp* zapis, int chislo_zapis) {
 	char b[50];
 
 	out = fopen("kp.txt", "r");
-	while(!feof(out)) {
+	while (!feof(out)) {
 		fscanf(out, "%d", &zapis[i].data[0]);
 		fscanf(out, "%d", &zapis[i].data[1]);
 		fscanf(out, "%d\n", &zapis[i].data[2]);
